@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum AdPosition {
+  AFTER_TITLE
+  BEFORE_PARAGRAPH_X
+  HEADER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(EDITOR)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  posts        Post[]
+}
+
+model Category {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  posts       PostCategory[]
+  excludedInAdBlocks AdBlock[] @relation("AdBlockExclusions")
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String
+  content   String   // HTML/Markdown
+  isRequired Boolean  @default(false)
+  showAds   Boolean   @default(true)
+  language  String    // ex: "pt", "en", "es"
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Post {
+  id            String         @id @default(cuid())
+  postNumber    Int            @unique @default(autoincrement())
+  title         String
+  slug          String
+  content       String         // HTML/Markdown
+  coverImageUrl String
+  googlePlayUrl String?        // URL opcional de app na Google Play
+  language      String         // ex: "pt", "en", "es"
+  status        PostStatus     @default(PUBLISHED)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  authorId      String
+  author        User           @relation(fields: [authorId], references: [id])
+
+  categories    PostCategory[]
+  translations  TranslationCache[] @relation("OriginalPostTranslations")
+}
+
+model PostCategory {
+  postId     String
+  categoryId String
+
+  post     Post     @relation(fields: [postId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@id([postId, categoryId])
+}
+
+model TranslationCache {
+  id               String   @id @default(cuid())
+  originalPostId   String
+  targetLanguage   String
+  translatedTitle  String
+  translatedContent String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  originalPost Post @relation("OriginalPostTranslations", fields: [originalPostId], references: [id])
+}
+
+model AdBlock {
+  id             String      @id @default(cuid())
+  name           String
+  position       AdPosition
+  paragraphIndex Int?
+  code           String      // HTML/JS do anúncio
+  isActive       Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  excludedCategories Category[] @relation("AdBlockExclusions")
+}
+
+model SiteSettings {
+  id           String   @id @default(cuid())
+  logoUrl      String?
+  faviconUrl   String?
+  primaryColor String?  // ex: #000000
+  secondaryColor String?
+  fontFamily   String?
+  layoutStyle  String?  // ex: "default"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+

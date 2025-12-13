@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #000000;
+  --foreground: #f9f9f9;
+}
+
+body {
+  @apply bg-black text-zinc-100;
+}
+
+/* Ajustes de tipografia para artigos (classe prose) focando em mobile/SEO */
+.prose {
+  @apply max-w-none;
+}
+
+.prose h1 {
+  @apply text-[1.5rem] leading-snug sm:text-3xl;
+}
+
+.prose h2 {
+  @apply mt-6 text-xl leading-snug sm:text-2xl;
+}
+
+.prose h3 {
+  @apply mt-5 text-lg leading-snug;
+}
+
+.prose p {
+  @apply my-3 text-[0.95rem] leading-relaxed sm:text-base;
+}
