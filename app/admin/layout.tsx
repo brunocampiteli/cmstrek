@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import "../globals.css";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -13,6 +14,11 @@ const navLinkBase =
 
 export default async function AdminLayout({ children }: AdminLayoutProps) {
   const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/admin/login");
+  }
+
   const role = (session?.user as any)?.role as string | undefined;
   const isAdmin = role === "ADMIN";
 
