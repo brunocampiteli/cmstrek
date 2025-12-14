@@ -23,9 +23,11 @@ export function AdminLoginForm({ logoUrl }: AdminLoginFormProps) {
     setLoading(true);
     setError(null);
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     const result = await signIn("credentials", {
       redirect: false,
-      email,
+      email: normalizedEmail,
       password,
       callbackUrl,
     });
@@ -37,7 +39,9 @@ export function AdminLoginForm({ logoUrl }: AdminLoginFormProps) {
       return;
     }
 
-    router.push(result.url ?? "/admin");
+    // Já estamos em /admin; apenas força o Next a recarregar os
+    // server components (layout) com a sessão autenticada.
+    router.refresh();
   }
 
   return (

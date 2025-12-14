@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 import "../globals.css";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
+import { AdminLoginForm } from "./login/AdminLoginForm";
+import { LogoutButton } from "./LogoutButton";
 
 type AdminLayoutProps = {
   children: ReactNode;
@@ -16,7 +18,15 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/admin/login");
+    let settings: { logoUrl: string | null } | null = null;
+
+    try {
+      settings = await prisma.siteSettings.findFirst();
+    } catch {
+      settings = null;
+    }
+
+    return <AdminLoginForm logoUrl={settings?.logoUrl ?? null} />;
   }
 
   const role = (session?.user as any)?.role as string | undefined;
@@ -95,6 +105,9 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
 
       <main className="flex-1 px-6 py-6">
         <div className="mx-auto max-w-5xl">
+          <div className="mb-4 flex items-center justify-end">
+            <LogoutButton />
+          </div>
           {children}
         </div>
       </main>
