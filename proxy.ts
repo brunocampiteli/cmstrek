@@ -112,6 +112,11 @@ function normalizeLang(lang: string) {
   return lang.toLowerCase();
 }
 
+function encodeGurlFromPath(pathname: string) {
+  const segments = pathname.split("/").filter(Boolean);
+  return segments.map((s) => encodeURIComponent(s)).join("/");
+}
+
 export function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
@@ -155,7 +160,7 @@ export function proxy(req: NextRequest) {
 
   const url = req.nextUrl.clone();
   url.pathname = "/api/gtranslate";
-  url.search = `?glang=${encodeURIComponent(lang)}&gurl=${encodeURIComponent(restPath.replace(/^\//, ""))}${search ? "&" + search.replace(/^\?/, "") : ""}`;
+  url.search = `?glang=${encodeURIComponent(lang)}&gurl=${encodeGurlFromPath(restPath)}${search ? "&" + search.replace(/^\?/, "") : ""}`;
 
   return NextResponse.rewrite(url);
 }

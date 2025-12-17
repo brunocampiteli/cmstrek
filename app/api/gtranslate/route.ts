@@ -201,7 +201,8 @@ async function proxy(req: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  const originalHost = req.headers.get("host") ?? "";
+  const originalHostRaw = req.headers.get("host") ?? "";
+  const originalHost = originalHostRaw.split(":")[0] ?? originalHostRaw;
   const server = SERVERS[pickServerId(originalHost)];
   const proto = getProto(req);
 
@@ -246,12 +247,17 @@ async function proxy(req: NextRequest) {
   const method = req.method.toUpperCase();
   const hasBody = method !== "GET" && method !== "HEAD";
 
-  const upstreamRes = await fetch(upstreamUrl, {
-    method,
-    headers,
-    body: hasBody ? req.body : undefined,
-    redirect: "manual",
-  });
+  let upstreamRes: Response;
+  try {
+    upstreamRes = await fetch(upstreamUrl, {
+      method,
+      headers,
+      body: hasBody ? req.body : undefined,
+      redirect: "manual",
+    });
+  } catch {
+    return new NextResponse(null, { status: 502 });
+  }
 
   const resHeaders = new Headers();
   upstreamRes.headers.forEach((value, key) => {
