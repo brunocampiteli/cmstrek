@@ -2,6 +2,7 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { PostEditor } from "../PostEditor";
 
 type Category = {
   id: string;
@@ -169,18 +170,14 @@ export default function EditPostPage() {
 
         <div className="space-y-1">
           <label className="block text-zinc-300" htmlFor="content">
-            Conteúdo (HTML)
+            Conteúdo
           </label>
-          <textarea
-            id="content"
-            value={post.content}
-            onChange={(e) => setPost({ ...post, content: e.target.value })}
-            rows={18}
-            className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm font-mono text-zinc-100 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30"
+          <PostEditor
+            initialContent={post.content}
+            onChange={(html) => setPost({ ...post, content: html })}
           />
           <p className="text-xs text-zinc-500">
-            Este campo suporta HTML completo. No futuro, podemos substituir por
-            um editor visual.
+            O conteúdo é salvo como HTML, gerado pelo editor visual.
           </p>
         </div>
 
