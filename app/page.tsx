@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 
 type HomeSearchParams = {
   searchParams?: Promise<{ category?: string }>;
@@ -59,12 +60,13 @@ export default async function Home({ searchParams }: HomeSearchParams) {
               className="group flex flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950/60 transition hover:border-emerald-500/60 hover:bg-zinc-900"
             >
               {post.coverImageUrl && (
-                // FUTURO: trocar por next/image
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={post.coverImageUrl}
                   alt={post.title}
+                  width={720}
+                  height={160}
                   className="h-40 w-full border-b border-zinc-800 object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               )}
               <div className="flex flex-1 flex-col gap-2 p-3">

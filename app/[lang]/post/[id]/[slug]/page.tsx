@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { getOrCreatePostTranslation } from "@/lib/translation";
+import Image from "next/image";
 
 type PostPageProps = {
   params: Promise<{
@@ -140,12 +141,14 @@ export default async function PublicPostPage({ params }: PostPageProps) {
         </header>
 
         {post.coverImageUrl && (
-          // FUTURO: trocar por next/image com otimização e lazy loading
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={post.coverImageUrl}
             alt={post.title}
+            width={1200}
+            height={630}
             className="h-auto w-full rounded-md border border-zinc-800 object-cover"
+            sizes="(max-width: 768px) 100vw, 768px"
+            priority
           />
         )}
 

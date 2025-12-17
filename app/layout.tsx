@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -77,13 +78,13 @@ export default async function RootLayout({
             <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3">
               <Link href="/" className="flex items-center gap-3">
                 {settings?.logoUrl ? (
-                  // FUTURO: trocar por next/image com otimização e dimensões adequadas
-                  // e carregar logoUrl vindo de um provedor como Cloudinary
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={settings.logoUrl}
                     alt="Logo"
+                    width={160}
+                    height={48}
                     className="h-10 w-auto sm:h-12"
+                    priority
                   />
                 ) : (
                   <span className="text-base font-semibold tracking-tight">
