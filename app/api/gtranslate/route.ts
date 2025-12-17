@@ -255,8 +255,23 @@ async function proxy(req: NextRequest) {
       body: hasBody ? req.body : undefined,
       redirect: "manual",
     });
-  } catch {
-    return new NextResponse(null, { status: 502 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json(
+      {
+        error: "gtranslate_upstream_fetch_failed",
+        message,
+        upstream: upstreamUrl.toString(),
+        host: originalHost,
+        tdnHost,
+      },
+      {
+        status: 502,
+        headers: {
+          "x-gt-proxy-error": message.slice(0, 180),
+        },
+      },
+    );
   }
 
   const resHeaders = new Headers();
